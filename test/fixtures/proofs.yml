@@ -1,0 +1,11 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  mentorship: one
+  menteeship: one
+  position: 1
+
+two:
+  mentorship: two
+  menteeship: two
+  position: 1
