@@ -9,7 +9,12 @@ Rails.application.routes.draw do
 
   get "/top_mentors" => "mentorships#top"
 
+
   devise_for :users, controllers: { registrations: "users/registrations", sessions: "users/sessions" }
+
+  devise_scope :user do
+    post "/upload_avatar" => "users/registrations#upload_avatar"
+  end
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 
   resources :user_availabilities, only: [:index, :create, :update]

@@ -17,6 +17,7 @@ gem 'figaro'
 gem 'devise-jwt' # JWT authentication for API
 gem 'active_model_serializers'
 gem 'rack-cors', :require => 'rack/cors'
+gem 'aws-sdk', "3.1.0"
 
 # Build JSON APIs with ease [https://github.com/rails/jbuilder]
 # gem "jbuilder"

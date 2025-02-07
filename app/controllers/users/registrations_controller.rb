@@ -1,6 +1,10 @@
 class Users::RegistrationsController < Devise::RegistrationsController
   respond_to :json
 
+  def upload_avatar
+    render json: User.find(params[:user_id]).upload_avatar(params)
+  end
+
   private
 
   def respond_with(resource, _opts = {})
@@ -24,4 +28,5 @@ class Users::RegistrationsController < Devise::RegistrationsController
       user.menteeships.create(skill: Skill.find(skill[:id]))
     end
   end
+
 end
