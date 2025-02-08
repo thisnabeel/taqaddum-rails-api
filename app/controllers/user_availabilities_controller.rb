@@ -5,10 +5,17 @@ class UserAvailabilitiesController < ApplicationController
     render json: availabilities
   end
 
+  def open_slots
+    availabilities = User.find_by(id: params[:user_id])&.available_meetups_for_next_week
+    render json: availabilities
+  end
+
   # Save or update availability
   def create
     user = User.find_by(id: params[:user_id])
     return render json: { error: "User not found" }, status: :not_found unless user
+
+    user.user_availabilities.destroy_all
 
     availability_params[:availability].each do |slot|
       existing_slot = user.user_availabilities.find_by(

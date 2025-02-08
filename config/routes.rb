@@ -8,6 +8,7 @@ Rails.application.routes.draw do
   resources :skills
 
   get "/top_mentors" => "mentorships#top"
+  get "/open_slots" => "user_availabilities#open_slots"
 
 
   devise_for :users, controllers: { registrations: "users/registrations", sessions: "users/sessions" }

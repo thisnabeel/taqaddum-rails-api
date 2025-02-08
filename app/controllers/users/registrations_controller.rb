@@ -1,32 +1,41 @@
 class Users::RegistrationsController < Devise::RegistrationsController
   respond_to :json
 
+  # Override create method
+  def create
+    # Extract mentor and mentee skills before filtering parameters
+    mentor_skills = params[:user].delete(:mentor_skills) || []
+    mentee_skills = params[:user].delete(:mentee_skills) || []
+
+    # Call Devise's default user creation method
+    super do |user|
+      if user.persisted?
+        create_mentorships_and_menteeships(user, mentor_skills, mentee_skills)
+        render json: UserSerializer.new(user).serializable_hash, status: :created and return
+      else
+        render json: { error: user.errors.full_messages }, status: :unprocessable_entity and return
+      end
+    end
+  end
+
   def upload_avatar
     render json: User.find(params[:user_id]).upload_avatar(params)
   end
 
   private
 
-  def respond_with(resource, _opts = {})
-    if resource.persisted?
-      create_mentorships_and_menteeships(resource) # Create mentorships & menteeships
-      render json: UserSerializer.new(resource).serializable_hash, status: :created
-    else
-      render json: { error: resource.errors.full_messages }, status: :unprocessable_entity
-    end
-  end
-
-  def create_mentorships_and_menteeships(user)
-    mentor_skills = params[:user][:mentor_skills] || []
-    mentee_skills = params[:user][:mentee_skills] || []
-
+  def create_mentorships_and_menteeships(user, mentor_skills, mentee_skills)
     mentor_skills.each do |skill|
-      user.mentorships.create(skill: Skill.find(skill[:id]))
+      user.mentorships.create(skill: Skill.find(skill[:id])) if skill[:id].present?
     end
 
     mentee_skills.each do |skill|
-      user.menteeships.create(skill: Skill.find(skill[:id]))
+      user.menteeships.create(skill: Skill.find(skill[:id])) if skill[:id].present?
     end
   end
 
+  # Permit only user attributes that are directly part of the model
+  def sign_up_params
+    params.require(:user).permit(:first_name, :last_name, :email, :password, :password_confirmation, :profession)
+  end
 end
