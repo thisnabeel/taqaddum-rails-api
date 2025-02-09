@@ -16,8 +16,9 @@ Rails.application.routes.draw do
   devise_scope :user do
     post "/upload_avatar" => "users/registrations#upload_avatar"
   end
-  # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 
+
+  put "/users/update" => "users/registrations#update"
   resources :user_availabilities, only: [:index, :create, :update]
   # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
   # Can be used by load balancers and uptime monitors to verify that the app is live.
