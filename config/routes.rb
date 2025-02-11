@@ -1,4 +1,5 @@
 Rails.application.routes.draw do
+
   resources :meeting_offerings
   resources :user_islamic_values
   resources :islamic_values
@@ -17,8 +18,16 @@ Rails.application.routes.draw do
     post "/upload_avatar" => "users/registrations#upload_avatar"
   end
 
+  resources :slots do
+  member do
+    patch :confirm
+    patch :block
+  end
+end
 
-  put "/users/update" => "users/registrations#update"
+
+
+  put "/users/update" => "users#update"
   resources :user_availabilities, only: [:index, :create, :update]
   # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
   # Can be used by load balancers and uptime monitors to verify that the app is live.

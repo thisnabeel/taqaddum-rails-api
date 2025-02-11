@@ -18,6 +18,22 @@ class Users::RegistrationsController < Devise::RegistrationsController
     end
   end
 
+  def update
+
+    puts "HELLOO"
+    user = User.find(params[:user][:id]) # Ensure you're updating the current user
+
+    mentor_skills = params[:user].delete(:mentor_skills) || []
+    mentee_skills = params[:user].delete(:mentee_skills) || []
+
+    if user.update(account_update_params)
+      create_mentorships_and_menteeships(user, mentor_skills, mentee_skills)
+      render json: UserSerializer.new(user).serializable_hash, status: :ok
+    else
+      render json: { error: user.errors.full_messages }, status: :unprocessable_entity
+    end
+  end
+
   def upload_avatar
     render json: User.find(params[:user_id]).upload_avatar(params)
   end

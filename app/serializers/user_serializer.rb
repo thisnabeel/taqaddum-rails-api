@@ -6,4 +6,5 @@ class UserSerializer < ActiveModel::Serializer
   def mentorships
     return object.mentorships.map {|m| MentorshipSerializer.new(m, include_user: false)}
   end
+
 end

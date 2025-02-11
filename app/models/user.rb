@@ -14,6 +14,8 @@ class User < ApplicationRecord
   has_many :user_availabilities, dependent: :destroy
 
   has_many :meeting_offerings, through: :mentorships
+  
+  has_many :slots, dependent: :destroy
 
   # Avatar
   def upload_avatar(params)

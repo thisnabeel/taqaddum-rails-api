@@ -4,7 +4,6 @@ class Users::SessionsController < Devise::SessionsController
   private
 
   def respond_with(resource, _opts = {})
-    puts "HEEEEE"
     if resource.persisted?
       render json: UserSerializer.new(resource).serializable_hash, status: :created
     else
