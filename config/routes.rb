@@ -19,15 +19,17 @@ Rails.application.routes.draw do
   end
 
   resources :slots do
-  member do
-    patch :confirm
-    patch :block
+    member do
+      patch :confirm
+      patch :block
+    end
   end
-end
 
 
+  post "/slots/configure" => "slots#configure"
 
   put "/users/update" => "users#update"
+  get "/list/mentors" => "users#mentors"
   resources :user_availabilities, only: [:index, :create, :update]
   # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
   # Can be used by load balancers and uptime monitors to verify that the app is live.

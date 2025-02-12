@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2025_02_11_154325) do
+ActiveRecord::Schema[7.1].define(version: 2025_02_12_103148) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -94,3 +94,46 @@ ActiveRecord::Schema[7.1].define(version: 2025_02_11_154325) do
     t.index ["user_id"], name: "index_user_availabilities_on_user_id"
   end
 
+  create_table "user_islamic_values", force: :cascade do |t|
+    t.bigint "islamic_value_id", null: false
+    t.bigint "user_id", null: false
+    t.text "summary"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["islamic_value_id"], name: "index_user_islamic_values_on_islamic_value_id"
+    t.index ["user_id"], name: "index_user_islamic_values_on_user_id"
+  end
+
+  create_table "users", force: :cascade do |t|
+    t.string "email", default: "", null: false
+    t.string "encrypted_password", default: "", null: false
+    t.string "reset_password_token"
+    t.datetime "reset_password_sent_at"
+    t.datetime "remember_created_at"
+    t.string "first_name"
+    t.string "last_name"
+    t.date "birthdate"
+    t.string "profession"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.string "avatar_cropped_url"
+    t.string "avatar_source_url"
+    t.string "company"
+    t.string "status", default: "pending approval"
+    t.index ["email"], name: "index_users_on_email", unique: true
+    t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
+  end
+
+  add_foreign_key "meeting_offerings", "mentorships"
+  add_foreign_key "menteeships", "skills"
+  add_foreign_key "menteeships", "users"
+  add_foreign_key "mentorships", "skills"
+  add_foreign_key "mentorships", "users"
+  add_foreign_key "proofs", "menteeships"
+  add_foreign_key "proofs", "mentorships"
+  add_foreign_key "slots", "meeting_offerings"
+  add_foreign_key "slots", "users"
+  add_foreign_key "user_availabilities", "users"
+  add_foreign_key "user_islamic_values", "islamic_values"
+  add_foreign_key "user_islamic_values", "users"
+end

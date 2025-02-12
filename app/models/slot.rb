@@ -3,17 +3,16 @@ class Slot < ApplicationRecord
   belongs_to :meeting_offering
 
   validates :start_time, :end_time, presence: true
-  validates :status, inclusion: { in: %w[pending confirmed blocked] }
+  validates :status, inclusion: { in: %w[locked denied] }
 
-  scope :available, -> { where(status: 'pending') }
-  scope :confirmed, -> { where(status: 'confirmed') }
-  scope :blocked, -> { where(status: 'blocked') }
+  scope :locked, -> { where(status: 'locked') }
+  scope :denied, -> { where(status: 'denied') }
 
   def confirm!
-    update!(status: 'confirmed')
+    update!(status: 'locked')
   end
 
   def block!
-    update!(status: 'blocked')
+    update!(status: 'denied')
   end
 end

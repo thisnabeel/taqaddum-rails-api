@@ -59,6 +59,12 @@ class User < ApplicationRecord
     potential_meetups = []
     unmatched_offerings = []
 
+    # ✅ Preload existing slots to minimize DB queries
+    existing_slots = Slot.where(
+      user_id: self.id, 
+      meeting_offering_id: meeting_offerings.map(&:id)
+    ).index_by { |s| [s.start_time, s.end_time, s.meeting_offering_id] }
+
     meeting_offerings.each do |offering|
       offering_matched = false
 
@@ -73,6 +79,11 @@ class User < ApplicationRecord
           slot_end = booking_date.in_time_zone("UTC").beginning_of_day + avail[:end_time].seconds_since_midnight
 
           while slot_start + duration <= slot_end
+            # ✅ Check if a slot already exists
+            slot_key = [slot_start, slot_start + duration, offering.id]
+            existing_slot = existing_slots[slot_key]
+            status = existing_slot ? existing_slot.status : "potential"
+
             potential_meetups << {
               title: offering.title,
               day: day,
@@ -80,6 +91,7 @@ class User < ApplicationRecord
               start_time: slot_start.utc.iso8601,  # Ensure UTC time
               end_time: (slot_start + duration).utc.iso8601,  # Ensure UTC time
               duration: offering.duration,
+              status: status,  # ✅ Include status (locked, denied, potential)
               offering: MeetingOfferingSerializer.new(offering)
             }
 
@@ -104,9 +116,6 @@ class User < ApplicationRecord
 
     { potential_meetups: potential_meetups.take(50), unmatched_offerings: unmatched_offerings.take(10), mentor: self }
   end
-
-
-
 
   # ✅ Fix: Finds **next** occurrence of the given weekday **without skipping a week**
   def nearest_occurrence_of(day_name)

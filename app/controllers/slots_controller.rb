@@ -3,7 +3,11 @@ class SlotsController < ApplicationController
 
   # GET /slots
   def index
-    @slots = Slot.all
+    if params[:user_id]
+      Slot.where(user_id: params[:user_id])
+    else
+      @slots = Slot.all
+    end
 
     render json: @slots
   end
@@ -47,6 +51,39 @@ class SlotsController < ApplicationController
   def block
     @slot.block!
     render json: @slot
+  end
+
+  def configure
+    slot_details = params[:slot_details]
+    user_id = params[:user_id]
+    meeting_offering_id = slot_details.dig("offering", "id")
+    start_time = slot_details["start_time"]
+    end_time = slot_details["end_time"]
+
+    case params[:status]
+    when "locked"
+      slot = Slot.find_or_create_by(user_id: user_id, meeting_offering_id: meeting_offering_id, start_time: start_time, end_time: end_time)
+      slot.update(status: "locked")
+      message = "Slot locked successfully."
+
+    when "denied"
+      slot = Slot.find_or_create_by(user_id: user_id, meeting_offering_id: meeting_offering_id, start_time: start_time, end_time: end_time)
+      slot.update(status: "denied")
+      message = "Slot denied successfully."
+
+    when "potential"
+      slot = Slot.find_by(user_id: user_id, meeting_offering_id: meeting_offering_id, start_time: start_time, end_time: end_time)
+      if slot
+        slot.destroy
+        message = "Potential slot removed."
+      else
+        message = "No potential slot found."
+      end
+    else
+      message = "Invalid status."
+    end
+
+    render json: { message: message, slot: slot || nil }
   end
 
   private

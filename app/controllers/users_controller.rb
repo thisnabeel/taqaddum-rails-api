@@ -2,16 +2,31 @@ class UsersController < ApplicationController
   before_action :set_user, only: %i[update]
 
   def update
+    if !params[:user][:mentor_skills].present?
+      skip_ship = true
+    end
     mentor_skills = params[:user].delete(:mentor_skills) || []
     mentee_skills = params[:user].delete(:mentee_skills) || []
 
     if @user.update(user_params)
-      update_mentorships_and_menteeships(@user, mentor_skills, mentee_skills)
+      if !skip_ship
+        update_mentorships_and_menteeships(@user, mentor_skills, mentee_skills)
+      end
       render json: @user, serializer: UserSerializer, status: :ok
     else
       render json: { error: @user.errors.full_messages }, status: :unprocessable_entity
     end
   end
+
+  def mentors
+    mentors_grouped = User.joins(:mentorships)
+                          .select('users.*')
+                          .distinct
+                          .group_by { |user| user.status }
+
+    render json: mentors_grouped
+  end
+
 
   private
 
@@ -28,7 +43,8 @@ class UsersController < ApplicationController
       :profession,
       :avatar_source_url,
       :avatar_cropped_url,
-      :company
+      :company,
+      :status
     )
   end
 
