@@ -52,6 +52,6 @@ class Users::RegistrationsController < Devise::RegistrationsController
 
   # Permit only user attributes that are directly part of the model
   def sign_up_params
-    params.require(:user).permit(:first_name, :last_name, :email, :password, :password_confirmation, :profession)
+    params.require(:user).permit(:first_name, :last_name, :email, :password, :password_confirmation, :profession, :company)
   end
 end
