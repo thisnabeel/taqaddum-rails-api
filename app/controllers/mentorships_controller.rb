@@ -13,12 +13,17 @@ class MentorshipsController < ApplicationController
   end
 
   def top
-    @mentors = User.joins(mentorships: :meeting_offerings)
-            .distinct
-            .limit(3)
+    mentorships = Mentorship.where(status: "approved")
+                            .joins(:user)
+                            .distinct
+                            .group_by(&:user_id) # Group by user
 
-    render json: @mentors, each_serializer: UserSerializer
+    # Select one random mentorship per unique user, then pick 3 users
+    unique_mentorships = mentorships.values.map(&:sample).shuffle.take(3)
+
+    render json: unique_mentorships, each_serializer: MentorshipSerializer, include_user: true
   end
+
 
   # GET /mentorships/1
   def show
@@ -58,6 +63,6 @@ class MentorshipsController < ApplicationController
 
     # Only allow a list of trusted parameters through.
     def mentorship_params
-      params.require(:mentorship).permit(:user_id, :skill_id, :summary)
+      params.require(:mentorship).permit(:user_id, :skill_id, :summary, :company, :profession, :status)
     end
 end

@@ -82,9 +82,10 @@ class User < ApplicationRecord
             # ✅ Check if a slot already exists
             slot_key = [slot_start, slot_start + duration, offering.id]
             existing_slot = existing_slots[slot_key]
-            status = existing_slot ? existing_slot.status : "potential"
+            status = existing_slot ? existing_slot.status : "open"
 
             potential_meetups << {
+              user_id: offering.mentorship.user_id,
               title: offering.title,
               day: day,
               booking_date: booking_date.iso8601,  # Store date in ISO 8601 (UTC)

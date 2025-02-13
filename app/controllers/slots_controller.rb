@@ -71,11 +71,11 @@ class SlotsController < ApplicationController
       slot.update(status: "denied")
       message = "Slot denied successfully."
 
-    when "potential"
+    when "open"
       slot = Slot.find_by(user_id: user_id, meeting_offering_id: meeting_offering_id, start_time: start_time, end_time: end_time)
       if slot
         slot.destroy
-        message = "Potential slot removed."
+        message = "Slot Open."
       else
         message = "No potential slot found."
       end

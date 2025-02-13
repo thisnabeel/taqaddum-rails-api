@@ -1,6 +1,7 @@
 class MeetingOffering < ApplicationRecord
   belongs_to :mentorship
   has_one :user, through: :mentorship
+  has_many :slots, dependent: :destroy
 
   validates :title, presence: true
   validates :duration, inclusion: { in: [30, 60, 90, 120], message: "must be 30, 60, 90, or 120 minutes" }

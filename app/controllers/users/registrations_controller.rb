@@ -35,6 +35,7 @@ class Users::RegistrationsController < Devise::RegistrationsController
   end
 
   def upload_avatar
+    puts params
     render json: User.find(params[:user_id]).upload_avatar(params)
   end
 
@@ -42,11 +43,11 @@ class Users::RegistrationsController < Devise::RegistrationsController
 
   def create_mentorships_and_menteeships(user, mentor_skills, mentee_skills)
     mentor_skills.each do |skill|
-      user.mentorships.create(skill: Skill.find(skill[:id])) if skill[:id].present?
+      user.mentorships.create(skill: Skill.find(skill[:id]), company: skill[:company], profession: skill[:profession]) if skill[:id].present?
     end
 
     mentee_skills.each do |skill|
-      user.menteeships.create(skill: Skill.find(skill[:id])) if skill[:id].present?
+      user.menteeships.create(skill: Skill.find(skill[:id]), company: skill[:company], profession: skill[:profession]) if skill[:id].present?
     end
   end
 

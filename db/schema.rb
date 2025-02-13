@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2025_02_12_103148) do
+ActiveRecord::Schema[7.1].define(version: 2025_02_12_220738) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -40,6 +40,9 @@ ActiveRecord::Schema[7.1].define(version: 2025_02_12_103148) do
     t.text "summary"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "company"
+    t.string "profession"
+    t.string "status", default: "pending approval"
     t.index ["skill_id"], name: "index_menteeships_on_skill_id"
     t.index ["user_id"], name: "index_menteeships_on_user_id"
   end
@@ -50,6 +53,9 @@ ActiveRecord::Schema[7.1].define(version: 2025_02_12_103148) do
     t.text "summary"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "company"
+    t.string "profession"
+    t.string "status", default: "pending approval"
     t.index ["skill_id"], name: "index_mentorships_on_skill_id"
     t.index ["user_id"], name: "index_mentorships_on_user_id"
   end

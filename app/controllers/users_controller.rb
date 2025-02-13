@@ -2,16 +2,16 @@ class UsersController < ApplicationController
   before_action :set_user, only: %i[update]
 
   def update
-    if !params[:user][:mentor_skills].present?
-      skip_ship = true
-    end
-    mentor_skills = params[:user].delete(:mentor_skills) || []
-    mentee_skills = params[:user].delete(:mentee_skills) || []
+    params[:user].delete(:id)
+    mentor_skills_to_add = params[:user].delete(:mentor_skills_to_add) || []
+    mentee_skills_to_add = params[:user].delete(:mentee_skills_to_add) || []
+
+    update_mentorships = params[:user].delete(:update_mentorships) || []
+    update_menteeships = params[:user].delete(:update_menteeships) || []
 
     if @user.update(user_params)
-      if !skip_ship
-        update_mentorships_and_menteeships(@user, mentor_skills, mentee_skills)
-      end
+      apply_mentorships_and_menteeships(@user, mentor_skills_to_add, mentee_skills_to_add)
+      update_mentorships_and_menteeships(@user, update_mentorships, update_menteeships)
       render json: @user, serializer: UserSerializer, status: :ok
     else
       render json: { error: @user.errors.full_messages }, status: :unprocessable_entity
@@ -19,13 +19,14 @@ class UsersController < ApplicationController
   end
 
   def mentors
-    mentors_grouped = User.joins(:mentorships)
-                          .select('users.*')
-                          .distinct
-                          .group_by { |user| user.status }
+    mentorships = Mentorship.includes(:user).group_by(&:status).transform_values do |group|
+      group.map { |mentorship| MentorshipSerializer.new(mentorship, include_user: true) }
+    end
 
-    render json: mentors_grouped
+    render json: mentorships
   end
+
+
 
 
   private
@@ -48,25 +49,33 @@ class UsersController < ApplicationController
     )
   end
 
-  def update_mentorships_and_menteeships(user, mentor_skills, mentee_skills)
-    # Extract skill IDs from the input arrays
-    mentor_skill_ids = mentor_skills.map { |skill| skill[:id] }.compact
-    mentee_skill_ids = mentee_skills.map { |skill| skill[:id] }.compact
-
-    # Delete mentorships that are not in the new list
-    user.mentorships.where.not(skill_id: mentor_skill_ids).destroy_all
-    # Add new mentorships
-    mentor_skill_ids.each do |skill_id|
-      user.mentorships.find_or_create_by(skill_id: skill_id)
+  def apply_mentorships_and_menteeships(user, mentorships, menteeships)
+    mentorships.each do |m|
+      puts m
+      mentorship = user.mentorships.find_or_create_by!(skill_id: m[:skill][:id])
+      
+      # Ensure m[:profession] and m[:company] exist before updating
+      mentorship.update!(profession: m[:profession], company: m[:company]) 
     end
 
-    # Delete menteeships that are not in the new list
-    user.menteeships.where.not(skill_id: mentee_skill_ids).destroy_all
-    # Add new menteeships
-    mentee_skill_ids.each do |skill_id|
-      user.menteeships.find_or_create_by(skill_id: skill_id)
+    menteeships.each do |m|
+      puts m
+      menteeship = user.mentorships.find_or_create_by!(skill_id: m[:skill][:id])
+      
+      # Ensure m[:profession] and m[:company] exist before updating
+      menteeship.update!(profession: m[:profession], company: m[:company]) 
     end
   end
 
+  def update_mentorships_and_menteeships(user, mentorships, menteeships)
+    mentorships.each do |m|
+      puts m
+      mentorship = Mentorship.find(m[:id]).update!(profession: m[:profession], company: m[:company]) 
+    end
 
+    menteeships.each do |m|
+      puts m
+      menteeship = Menteeship.find(m[:id]).update!(profession: m[:profession], company: m[:company]) 
+    end
+  end
 end
