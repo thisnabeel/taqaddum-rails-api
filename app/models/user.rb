@@ -59,6 +59,21 @@ class User < ApplicationRecord
     potential_meetups = []
     unmatched_offerings = []
 
+    self.slots.each do |slot|
+      offering = slot.meeting_offering
+      potential_meetups << {
+              user_id: slot.user_id,
+              title: offering.title,
+              day: slot.start_time.day,
+              booking_date: slot.start_time.utc.iso8601,  # Store date in ISO 8601 (UTC)
+              start_time: slot.start_time.utc.iso8601,  # Ensure UTC time
+              end_time: (slot.end_time + offering.duration).utc.iso8601,  # Ensure UTC time
+              duration: offering.duration,
+              status: slot.status,  # ✅ Include status (locked, denied, potential)
+              offering: MeetingOfferingSerializer.new(offering)
+            }
+    end
+
     # ✅ Preload existing slots to minimize DB queries
     existing_slots = Slot.where(
       user_id: self.id, 

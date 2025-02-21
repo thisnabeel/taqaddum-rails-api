@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2025_02_12_220738) do
+ActiveRecord::Schema[7.1].define(version: 2025_02_21_093359) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -79,13 +79,21 @@ ActiveRecord::Schema[7.1].define(version: 2025_02_12_220738) do
 
   create_table "slots", force: :cascade do |t|
     t.bigint "user_id", null: false
-    t.bigint "meeting_offering_id", null: false
+    t.bigint "meeting_offering_id"
     t.datetime "start_time"
     t.datetime "end_time"
     t.string "status"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.text "description"
+    t.integer "duration", default: 30
+    t.string "title"
+    t.integer "max_attendees"
+    t.integer "min_attendees"
+    t.string "timezone"
+    t.bigint "mentorship_id"
     t.index ["meeting_offering_id"], name: "index_slots_on_meeting_offering_id"
+    t.index ["mentorship_id"], name: "index_slots_on_mentorship_id"
     t.index ["user_id"], name: "index_slots_on_user_id"
   end
 
@@ -138,6 +146,7 @@ ActiveRecord::Schema[7.1].define(version: 2025_02_12_220738) do
   add_foreign_key "proofs", "menteeships"
   add_foreign_key "proofs", "mentorships"
   add_foreign_key "slots", "meeting_offerings"
+  add_foreign_key "slots", "mentorships"
   add_foreign_key "slots", "users"
   add_foreign_key "user_availabilities", "users"
   add_foreign_key "user_islamic_values", "islamic_values"

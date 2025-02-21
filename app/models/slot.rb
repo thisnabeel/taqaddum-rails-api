@@ -1,15 +1,16 @@
 class Slot < ApplicationRecord
   belongs_to :user
-  belongs_to :meeting_offering
+  belongs_to :meeting_offering, optional: true
+  belongs_to :mentorship, optional: true
 
   validates :start_time, :end_time, presence: true
-  validates :status, inclusion: { in: %w[locked denied] }
+  validates :status, inclusion: { in: %w[open denied] }
 
-  scope :locked, -> { where(status: 'locked') }
+  scope :open, -> { where(status: 'open') }
   scope :denied, -> { where(status: 'denied') }
 
   def confirm!
-    update!(status: 'locked')
+    update!(status: 'open')
   end
 
   def block!

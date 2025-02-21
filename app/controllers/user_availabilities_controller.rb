@@ -6,8 +6,13 @@ class UserAvailabilitiesController < ApplicationController
   end
 
   def open_slots
-    availabilities = User.find_by(id: params[:user_id])&.available_meetups_for_next_week
-    render json: availabilities
+    # availabilities = User.find_by(id: params[:user_id])&.available_meetups_for_next_week
+    user = User.find_by(id: params[:user_id])
+    availabilities = user.slots.order("start_time ASC")
+    render json: {
+      user: user,
+      slots: availabilities.map {|a| SlotSerializer.new(a)}
+    }
   end
 
   # Save or update availability
