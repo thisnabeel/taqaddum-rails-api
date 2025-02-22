@@ -1,4 +1,7 @@
 class User < ApplicationRecord
+
+
+
   devise :database_authenticatable, :registerable,
          :recoverable, :rememberable, :validatable
 
@@ -16,6 +19,38 @@ class User < ApplicationRecord
   has_many :meeting_offerings, through: :mentorships
   
   has_many :slots, dependent: :destroy
+  has_many :slot_bookings, dependent: :destroy
+  # Allow the same email if the type is different (e.g., a user can be both a Mentor and a Mentee)
+
+  # Add our custom validation
+  # First, remove all email validations
+  _validators.delete(:email)
+  _validate_callbacks.each do |callback|
+    if callback.filter.respond_to?(:attributes) && callback.filter.attributes.include?(:email)
+      skip_callback(:validate, callback.kind, callback.filter)
+    end
+  end
+
+  # Then add our custom validation
+  validates :email, 
+            presence: true,
+            format: { with: Devise.email_regexp },
+            uniqueness: { scope: :type }
+
+  # Override Devise's email validation method
+  def will_save_change_to_email?
+    false
+  end
+
+  # Override Devise's email required method
+  def email_required?
+    true
+  end
+
+  # Override Devise's email changed method
+  def email_changed?
+    false
+  end
 
   # Avatar
   def upload_avatar(params)

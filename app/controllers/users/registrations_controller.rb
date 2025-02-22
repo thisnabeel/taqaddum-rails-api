@@ -3,6 +3,8 @@ class Users::RegistrationsController < Devise::RegistrationsController
 
   # Override create method
   def create
+
+    Rails.logger.info "Received params: #{params.inspect}" # Debug params
     # Extract mentor and mentee skills before filtering parameters
     mentor_skills = params[:user].delete(:mentor_skills) || []
     mentee_skills = params[:user].delete(:mentee_skills) || []
@@ -53,6 +55,6 @@ class Users::RegistrationsController < Devise::RegistrationsController
 
   # Permit only user attributes that are directly part of the model
   def sign_up_params
-    params.require(:user).permit(:first_name, :last_name, :email, :password, :password_confirmation, :profession, :company)
+    params.require(:user).permit(:first_name, :last_name, :email, :password, :password_confirmation, :profession, :company, :type)
   end
 end

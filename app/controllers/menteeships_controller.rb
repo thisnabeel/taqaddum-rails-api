@@ -46,6 +46,6 @@ class MenteeshipsController < ApplicationController
 
     # Only allow a list of trusted parameters through.
     def menteeship_params
-      params.require(:menteeship).permit(:user_id, :skill_id, :summary)
+      params.require(:menteeship).permit(:user_id, :skill_id, :summary, :company, :profession, :status)
     end
 end

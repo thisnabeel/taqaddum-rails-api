@@ -1,4 +1,5 @@
 Rails.application.routes.draw do
+  resources :slot_bookings
 
   resources :meeting_offerings
   resources :user_islamic_values
@@ -30,6 +31,11 @@ Rails.application.routes.draw do
 
   put "/users/update" => "users#update"
   get "/list/mentors" => "users#mentors"
+  get "/list/mentees" => "users#mentees"
+
+  get "/mentors/:id/dashboard" => "mentors#dashboard"
+  get "/mentees/:id/dashboard" => "mentees#dashboard"
+
   resources :user_availabilities, only: [:index, :create, :update]
   # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
   # Can be used by load balancers and uptime monitors to verify that the app is live.

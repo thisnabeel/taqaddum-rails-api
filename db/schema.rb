@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2025_02_21_093359) do
+ActiveRecord::Schema[7.1].define(version: 2025_02_22_141908) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -77,6 +77,18 @@ ActiveRecord::Schema[7.1].define(version: 2025_02_21_093359) do
     t.datetime "updated_at", null: false
   end
 
+  create_table "slot_bookings", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.bigint "slot_id", null: false
+    t.string "status"
+    t.datetime "booking_date"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["slot_id"], name: "index_slot_bookings_on_slot_id"
+    t.index ["user_id", "slot_id"], name: "index_slot_bookings_on_user_id_and_slot_id", unique: true
+    t.index ["user_id"], name: "index_slot_bookings_on_user_id"
+  end
+
   create_table "slots", force: :cascade do |t|
     t.bigint "user_id", null: false
     t.bigint "meeting_offering_id"
@@ -134,7 +146,8 @@ ActiveRecord::Schema[7.1].define(version: 2025_02_21_093359) do
     t.string "avatar_source_url"
     t.string "company"
     t.string "status", default: "pending approval"
-    t.index ["email"], name: "index_users_on_email", unique: true
+    t.string "type"
+    t.index ["email", "type"], name: "index_users_on_email_and_type", unique: true
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
   end
 
@@ -145,6 +158,8 @@ ActiveRecord::Schema[7.1].define(version: 2025_02_21_093359) do
   add_foreign_key "mentorships", "users"
   add_foreign_key "proofs", "menteeships"
   add_foreign_key "proofs", "mentorships"
+  add_foreign_key "slot_bookings", "slots"
+  add_foreign_key "slot_bookings", "users"
   add_foreign_key "slots", "meeting_offerings"
   add_foreign_key "slots", "mentorships"
   add_foreign_key "slots", "users"

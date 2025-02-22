@@ -26,6 +26,14 @@ class UsersController < ApplicationController
     render json: mentorships
   end
 
+  def mentees
+    menteeships = Menteeship.includes(:user).group_by(&:status).transform_values do |group|
+      group.map { |menteeship| MenteeshipSerializer.new(menteeship, include_user: true) }
+    end
+
+    render json: menteeships
+  end
+
 
 
 
@@ -45,7 +53,8 @@ class UsersController < ApplicationController
       :avatar_source_url,
       :avatar_cropped_url,
       :company,
-      :status
+      :status,
+      :type
     )
   end
 
