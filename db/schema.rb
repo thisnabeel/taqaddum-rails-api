@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2025_02_22_141908) do
+ActiveRecord::Schema[7.1].define(version: 2025_02_22_152135) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -19,6 +19,18 @@ ActiveRecord::Schema[7.1].define(version: 2025_02_22_141908) do
     t.text "description"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+  end
+
+  create_table "letters", force: :cascade do |t|
+    t.text "body"
+    t.string "letter_type"
+    t.bigint "mentor_id", null: false
+    t.bigint "mentee_id", null: false
+    t.boolean "read"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["mentee_id"], name: "index_letters_on_mentee_id"
+    t.index ["mentor_id"], name: "index_letters_on_mentor_id"
   end
 
   create_table "meeting_offerings", force: :cascade do |t|
@@ -151,6 +163,8 @@ ActiveRecord::Schema[7.1].define(version: 2025_02_22_141908) do
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
   end
 
+  add_foreign_key "letters", "users", column: "mentee_id"
+  add_foreign_key "letters", "users", column: "mentor_id"
   add_foreign_key "meeting_offerings", "mentorships"
   add_foreign_key "menteeships", "skills"
   add_foreign_key "menteeships", "users"

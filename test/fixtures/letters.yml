@@ -1,0 +1,15 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  body: MyText
+  letter_type: MyString
+  mentor: one
+  mentee: one
+  read: false
+
+two:
+  body: MyText
+  letter_type: MyString
+  mentor: two
+  mentee: two
+  read: false
