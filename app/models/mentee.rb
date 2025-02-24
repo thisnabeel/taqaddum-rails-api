@@ -19,7 +19,8 @@ class Mentee < User
                 pending: pending_menteeships.map {|o| MenteeshipSerializer.new(o)}
             },
             mentors: {
-                pool: mentor_pool.map {|o| MentorshipSerializer.new(o, include_user: true)}
+                pool: mentor_pool.map {|o| MentorshipSerializer.new(o, include_user: true)},
+                sessions: mentor_pool.map {|m| m.slots}.flatten.map {|s| SlotSerializer.new(s, include_user: true)}
             },
             bookings: bookings.map {|o| SlotBookingSerializer.new(o)}
         }
