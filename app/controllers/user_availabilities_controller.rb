@@ -11,7 +11,7 @@ class UserAvailabilitiesController < ApplicationController
     availabilities = user.slots.order("start_time ASC")
     render json: {
       user: user,
-      slots: availabilities.map {|a| SlotSerializer.new(a)}
+      slots: availabilities.map {|a| SlotSerializer.new(a, include_attendees: true, include_user: true)}
     }
   end
 
