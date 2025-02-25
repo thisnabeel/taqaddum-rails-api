@@ -10,6 +10,31 @@ class SkillsController < ApplicationController
     render json: @skills.shuffle
   end
 
+  def offerings_ai
+    
+    @skill_slot_ideas = SkillSlotIdea.where(skill_id: params[:id])
+    if !@skill_slot_ideas.present?
+      prompt = "
+        give me 5 online workshop meeting ideas for `#{params[:title]}` career building. Geared towards mentees in college. for an hour long meeting.
+        give in one single flat array of objects like [{title:, description: (under 200 characters starting with 'We Will...')},...]
+      "
+      response = SmartWizard.request(prompt)
+  
+      # If the response is wrapped inside a key like "workshops", extract it
+      ideas = response.is_a?(Hash) && response["workshops"] ? response["workshops"] : response
+      @skill_slot_ideas = ideas.map do |idea|
+        begin
+          SkillSlotIdea.create!(title: idea["title"], description: idea["description"], skill_id: params[:id])
+        rescue => e
+          puts e
+        end
+      end
+    end
+
+    render json: @skill_slot_ideas
+  end
+
+
   # GET /skills/1
   def show
     render json: @skill

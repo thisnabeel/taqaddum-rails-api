@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2025_02_22_152135) do
+ActiveRecord::Schema[7.1].define(version: 2025_02_25_180630) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -80,6 +80,15 @@ ActiveRecord::Schema[7.1].define(version: 2025_02_22_152135) do
     t.datetime "updated_at", null: false
     t.index ["menteeship_id"], name: "index_proofs_on_menteeship_id"
     t.index ["mentorship_id"], name: "index_proofs_on_mentorship_id"
+  end
+
+  create_table "skill_slot_ideas", force: :cascade do |t|
+    t.string "title"
+    t.text "description"
+    t.bigint "skill_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["skill_id"], name: "index_skill_slot_ideas_on_skill_id"
   end
 
   create_table "skills", force: :cascade do |t|
@@ -172,6 +181,7 @@ ActiveRecord::Schema[7.1].define(version: 2025_02_22_152135) do
   add_foreign_key "mentorships", "users"
   add_foreign_key "proofs", "menteeships"
   add_foreign_key "proofs", "mentorships"
+  add_foreign_key "skill_slot_ideas", "skills"
   add_foreign_key "slot_bookings", "slots"
   add_foreign_key "slot_bookings", "users"
   add_foreign_key "slots", "meeting_offerings"

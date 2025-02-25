@@ -13,6 +13,7 @@ gem "puma", ">= 5.0"
 gem 'devise'
 
 gem 'figaro'
+gem 'ruby-openai', '~> 4.2'
 
 gem 'devise-jwt' # JWT authentication for API
 gem 'active_model_serializers'

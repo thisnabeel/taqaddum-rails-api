@@ -22,7 +22,7 @@ class SlotsController < ApplicationController
     @slot = Slot.new(slot_params)
 
     if @slot.save
-      render json: @slot, status: :created, location: @slot
+      render json: @slot, status: :created, location: @slot, serializer: SlotSerializer, include_user: true
     else
       render json: @slot.errors, status: :unprocessable_entity
     end
