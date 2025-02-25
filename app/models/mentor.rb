@@ -6,7 +6,8 @@ class Mentor < User
         pending_mentorships = self.mentorships.where(status: "pending approval")
         mentee_pool = Menteeship.where(status: "approved", skill_id: approved_mentorships.map{|m| m.skill_id})
 
-        bookings = self.slots.includes(:slot_bookings).where.not(slot_bookings: { id: nil })
+        bookings = self.slots.where("start_time > ?", Time.current).order("start_time ASC").includes(:slot_bookings).where.not(slot_bookings: { id: nil })
+
 
         return {
             mentorships: {

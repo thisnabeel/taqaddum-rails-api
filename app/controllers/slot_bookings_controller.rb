@@ -18,7 +18,7 @@ class SlotBookingsController < ApplicationController
     @slot_booking = SlotBooking.new(slot_booking_params)
 
     if @slot_booking.save
-      render json: @slot_booking, status: :created, location: @slot_booking
+      render json: @slot_booking, status: :created, location: @slot_booking,  serializer: SlotBookingSerializer
     else
       render json: @slot_booking.errors, status: :unprocessable_entity
     end

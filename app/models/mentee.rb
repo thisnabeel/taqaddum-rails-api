@@ -11,7 +11,7 @@ class Mentee < User
             skill_id: self.menteeships.map{|m| m.skill_id}
         )
 
-        bookings = self.slot_bookings
+        bookings = self.slot_bookings.joins(:slot).where("slots.start_time > ?", Time.current).order("slots.start_time ASC")
 
         return {
             menteeships: {
@@ -20,7 +20,7 @@ class Mentee < User
             },
             mentors: {
                 pool: mentor_pool.map {|o| MentorshipSerializer.new(o, include_user: true)},
-                sessions: mentor_pool.map {|m| m.slots}.flatten.map {|s| SlotSerializer.new(s, include_user: true)}
+                sessions: mentor_pool.map {|m| m.slots.where("slots.start_time > ?", Time.current)}.flatten.map {|s| SlotSerializer.new(s, include_user: true)}
             },
             bookings: bookings.map {|o| SlotBookingSerializer.new(o)}
         }
