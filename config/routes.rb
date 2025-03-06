@@ -37,6 +37,10 @@ Rails.application.routes.draw do
 
   get "/mentors/:id/dashboard" => "mentors#dashboard"
   get "/mentees/:id/dashboard" => "mentees#dashboard"
+  post '/create-checkout-session', to: 'checkout#create'
+
+  get '/fundraiser/money_raised' => "checkout#money_raised"
+  get '/success/:session_id' => "checkout#success"
 
   post "/skills/offerings_ai" => "skills#offerings_ai"
   resources :user_availabilities, only: [:index, :create, :update]

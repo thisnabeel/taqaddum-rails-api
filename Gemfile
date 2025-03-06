@@ -15,6 +15,8 @@ gem 'devise'
 gem 'figaro'
 gem 'ruby-openai', '~> 4.2'
 
+gem "stripe"
+
 gem 'devise-jwt' # JWT authentication for API
 gem 'active_model_serializers'
 gem 'rack-cors', :require => 'rack/cors'
