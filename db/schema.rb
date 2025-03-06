@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2025_02_25_180630) do
+ActiveRecord::Schema[7.1].define(version: 2025_03_06_232908) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -128,6 +128,18 @@ ActiveRecord::Schema[7.1].define(version: 2025_02_25_180630) do
     t.index ["meeting_offering_id"], name: "index_slots_on_meeting_offering_id"
     t.index ["mentorship_id"], name: "index_slots_on_mentorship_id"
     t.index ["user_id"], name: "index_slots_on_user_id"
+  end
+
+  create_table "sponsorship_interests", force: :cascade do |t|
+    t.string "contact_name"
+    t.string "contact_email"
+    t.string "contact_phone"
+    t.string "org_name"
+    t.string "org_website"
+    t.text "org_details"
+    t.string "status"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "user_availabilities", force: :cascade do |t|

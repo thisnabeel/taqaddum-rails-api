@@ -1,4 +1,5 @@
 Rails.application.routes.draw do
+  resources :sponsorship_interests
   resources :skill_slot_ideas
   resources :letters
   resources :slot_bookings
