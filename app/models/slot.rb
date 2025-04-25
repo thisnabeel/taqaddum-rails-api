@@ -10,8 +10,16 @@ class Slot < ApplicationRecord
   validates :start_time, :end_time, presence: true
   validates :status, inclusion: { in: %w[open denied] }
 
+  before_create :default_title
+
   scope :open, -> { where(status: 'open') }
   scope :denied, -> { where(status: 'denied') }
+
+  def default_title
+    if !self.title.present?
+      self.title = "Untitled Slot Title"
+    end
+  end
 
   def confirm!
     update!(status: 'open')
