@@ -34,8 +34,10 @@ class UsersController < ApplicationController
     render json: menteeships
   end
 
-
-
+  def leads
+    leads = User.where.not(preapproval_token: nil)
+    render json: leads
+  end
 
   private
 

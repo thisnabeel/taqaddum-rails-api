@@ -37,6 +37,7 @@ class User < ApplicationRecord
             format: { with: Devise.email_regexp },
             uniqueness: { scope: :type }
 
+
   # Override Devise's email validation method
   def will_save_change_to_email?
     false
@@ -85,6 +86,10 @@ class User < ApplicationRecord
                             Time.zone.now.end_of_day + 7.days)
 
     generate_potential_meetups(meeting_offerings, availabilities)
+  end
+
+  def self.without_availabilities
+    left_joins(:user_availabilities).where(user_availabilities: { id: nil })
   end
 
   private

@@ -20,6 +20,41 @@ class Users::RegistrationsController < Devise::RegistrationsController
     end
   end
 
+  def create_with_preapproval
+    Rails.logger.info "Received params for preapproval: #{params.inspect}" # Debug params
+
+    # Normalize camelCase keys to snake_case
+    params[:user][:mentor_skills] = params[:user].delete(:mentorSkills) || []
+    params[:user][:mentee_skills] = params[:user].delete(:menteeSkills) || []
+
+    mentor_skills = params[:user].delete(:mentor_skills)
+    mentee_skills = params[:user].delete(:mentee_skills)
+    skills = params[:user].delete(:skills) || [] # Extract skills separately
+    # Add linkedin_url and other attributes to permitted parameters
+    user_params = params.require(:user).permit(:first_name, :last_name, :email, :profession, :company, :type, :linkedin_url)
+
+    # Ensure the preapproval_token is unique to the user
+    preapproval_token = ""
+    loop do
+      preapproval_token = SecureRandom.uuid[0..5] # Generate a 6-character UUID
+      break unless User.exists?(preapproval_token: preapproval_token)
+    end
+
+    user = User.new(user_params.merge(password: "invited101!", preapproval_token: preapproval_token))
+
+    if user.save
+      # Create associated skills for the user
+      skills.each do |skill|
+        user.skills.create(skill.permit(:id, :title, :description)) if skill[:id].present?
+      end
+
+      create_mentorships_and_menteeships(user, mentor_skills, mentee_skills)
+      render json: UserSerializer.new(user).serializable_hash, status: :created
+    else
+      render json: { error: user.errors.full_messages }, status: :unprocessable_entity
+    end
+  end
+
   def update
 
     puts "HELLOO"

@@ -22,6 +22,10 @@ Rails.application.routes.draw do
     post "/upload_avatar" => "users/registrations#upload_avatar"
   end
 
+  devise_scope :user do
+    post '/users/registrations/create_with_preapproval', to: 'users/registrations#create_with_preapproval'
+  end
+
   resources :slots do
     member do
       patch :confirm
@@ -48,6 +52,13 @@ Rails.application.routes.draw do
   # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
   # Can be used by load balancers and uptime monitors to verify that the app is live.
   get "up" => "rails/health#show", as: :rails_health_check
+
+  namespace :users do
+    post 'registrations/create_with_preapproval', to: 'registrations#create_with_preapproval'
+    get 'leads', to: 'leads#index' # New route for fetching leads
+    get 'leads/:token', to: 'leads#show'
+    delete 'leads/:id', to: 'leads#destroy' # New route for deleting a lead
+  end
 
   # Defines the root path route ("/")
   # root "posts#index"
