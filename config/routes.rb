@@ -58,7 +58,10 @@ Rails.application.routes.draw do
     get 'leads', to: 'leads#index' # New route for fetching leads
     get 'leads/:token', to: 'leads#show'
     delete 'leads/:id', to: 'leads#destroy' # New route for deleting a lead
+    patch 'preapprovals/:token', to: 'preapprovals#update' # New route for updating preapproved user
   end
+
+  post '/users/send_invitation', to: 'users#send_invitation'
 
   # Defines the root path route ("/")
   # root "posts#index"

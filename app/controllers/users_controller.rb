@@ -39,6 +39,29 @@ class UsersController < ApplicationController
     render json: leads
   end
 
+  def send_invitation
+    inviter = User.find(params[:inviter_id])
+    user = User.find(params[:invitee_id])
+
+    # Assuming Resend API client is configured
+    require "resend"
+
+    Resend.api_key = ENV["RESEND_API_KEY"]
+
+    payload = {
+      "from": "Taqaddum@resend.dev",
+      "to": [user.email],
+      "html": params[:body],
+      "subject": "PREAPPROVED - #{inviter.first_name} is inviting you to Taqaddum"
+    }
+    r = Resend::Emails.send(payload)
+
+    render json: { message: "Invitation sent successfully to #{user.email}" }, status: :ok
+  rescue StandardError => e
+    puts e.message
+    render json: { error: e.message }, status: :unprocessable_entity
+  end
+
   private
 
   def set_user
