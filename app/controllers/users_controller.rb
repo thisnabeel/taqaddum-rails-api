@@ -49,7 +49,7 @@ class UsersController < ApplicationController
     Resend.api_key = ENV["RESEND_API_KEY"]
 
     payload = {
-      "from": "Taqaddum@resend.dev",
+      "from": "Taqaddum Team <donotreply@office.taqaddum.org>",
       "to": [user.email],
       "html": params[:body],
       "subject": "PREAPPROVED - #{inviter.first_name} is inviting you to Taqaddum"
