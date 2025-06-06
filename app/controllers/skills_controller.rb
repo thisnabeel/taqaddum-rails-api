@@ -11,14 +11,13 @@ class SkillsController < ApplicationController
   end
 
   def offerings_ai
-    
     @skill_slot_ideas = SkillSlotIdea.where(skill_id: params[:id])
     if !@skill_slot_ideas.present?
       prompt = "
         give me 5 online workshop meeting ideas for `#{params[:title]}` career building. Geared towards mentees in college. for an hour long meeting.
         give in one single flat array of objects like [{title:, description: (under 200 characters starting with 'We Will...')},...]
       "
-      response = SmartWizard.request(prompt)
+      response = Wizard.request(prompt)
   
       # If the response is wrapped inside a key like "workshops", extract it
       ideas = response.is_a?(Hash) && response["workshops"] ? response["workshops"] : response
