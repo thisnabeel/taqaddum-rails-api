@@ -1,6 +1,5 @@
 class User < ApplicationRecord
-
-
+  enum visibility: { global: "global", connections: "connections", hidden: "hidden" }
 
   devise :database_authenticatable, :registerable,
          :recoverable, :rememberable, :validatable
@@ -20,10 +19,10 @@ class User < ApplicationRecord
   
   has_many :slots, dependent: :destroy
   has_many :slot_bookings, dependent: :destroy
+  has_many :questions, dependent: :destroy
   # Allow the same email if the type is different (e.g., a user can be both a Mentor and a Mentee)
 
-  # Add our custom validation
-  # First, remove all email validations
+  # Remove all email validations
   _validators.delete(:email)
   _validate_callbacks.each do |callback|
     if callback.filter.respond_to?(:attributes) && callback.filter.attributes.include?(:email)
@@ -31,25 +30,33 @@ class User < ApplicationRecord
     end
   end
 
-  # Then add our custom validation
+  # Add custom email validation that only applies if email is present
   validates :email, 
-            presence: true,
-            format: { with: Devise.email_regexp },
-            uniqueness: { scope: :type }
-
-
-  # Override Devise's email validation method
-  def will_save_change_to_email?
-    false
-  end
+            format: { with: Devise.email_regexp, allow_blank: true },
+            uniqueness: { scope: :type, allow_blank: true }
 
   # Override Devise's email required method
   def email_required?
+    false
+  end
+
+  # Override Devise's password required method
+  def password_required?
     true
   end
 
   # Override Devise's email changed method
   def email_changed?
+    false
+  end
+
+  # Override Devise's reconfirmation required method
+  def reconfirmation_required?
+    false
+  end
+
+  # Override Devise's will_save_change_to_email? method
+  def will_save_change_to_email?
     false
   end
 
@@ -90,6 +97,12 @@ class User < ApplicationRecord
 
   def self.without_availabilities
     left_joins(:user_availabilities).where(user_availabilities: { id: nil })
+  end
+
+  def questions_pool
+    self.mentorships.map do |mentorship|
+      mentorship.skill.questions
+    end.flatten
   end
 
   private

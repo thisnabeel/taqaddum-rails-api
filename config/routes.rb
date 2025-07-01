@@ -1,4 +1,6 @@
 Rails.application.routes.draw do
+  resources :question_answers
+  get "/question_answers/for_question/:question_id" => "question_answers#for_question"
   resources :sponsorship_interests
   resources :skill_slot_ideas
   resources :letters
@@ -10,7 +12,18 @@ Rails.application.routes.draw do
   resources :proofs
   resources :menteeships
   resources :mentorships
-  resources :skills
+  resources :skills do
+    member do
+      get :mentees
+      get :mentors
+    end
+  end
+
+  # Questions routes
+  resources :questions
+  get "/questions/from/:user_id" => "questions#from_user"
+  get "/questions/for/:user_id" => "questions#for_user"
+  get "/questions/from/:questionable_type/:questionable_id" => "questions#from_questionable"
 
   get "/top_mentors" => "mentorships#top"
   get "/open_slots" => "user_availabilities#open_slots"

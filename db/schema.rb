@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2025_05_15_042712) do
+ActiveRecord::Schema[7.1].define(version: 2025_07_01_015236) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -80,6 +80,27 @@ ActiveRecord::Schema[7.1].define(version: 2025_05_15_042712) do
     t.datetime "updated_at", null: false
     t.index ["menteeship_id"], name: "index_proofs_on_menteeship_id"
     t.index ["mentorship_id"], name: "index_proofs_on_mentorship_id"
+  end
+
+  create_table "question_answers", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.text "body"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "question_id", null: false
+    t.index ["question_id"], name: "index_question_answers_on_question_id"
+    t.index ["user_id"], name: "index_question_answers_on_user_id"
+  end
+
+  create_table "questions", force: :cascade do |t|
+    t.text "body"
+    t.bigint "user_id", null: false
+    t.string "questionable_type", null: false
+    t.bigint "questionable_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["questionable_type", "questionable_id"], name: "index_questions_on_questionable"
+    t.index ["user_id"], name: "index_questions_on_user_id"
   end
 
   create_table "skill_slot_ideas", force: :cascade do |t|
@@ -164,7 +185,7 @@ ActiveRecord::Schema[7.1].define(version: 2025_05_15_042712) do
   end
 
   create_table "users", force: :cascade do |t|
-    t.string "email", default: "", null: false
+    t.string "email"
     t.string "encrypted_password", default: "", null: false
     t.string "reset_password_token"
     t.datetime "reset_password_sent_at"
@@ -185,8 +206,10 @@ ActiveRecord::Schema[7.1].define(version: 2025_05_15_042712) do
     t.json "roles", default: []
     t.datetime "invite_letter_sent_at"
     t.datetime "converted_at"
+    t.string "visibility", default: "connections"
     t.index ["email", "type"], name: "index_users_on_email_and_type", unique: true
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
+    t.check_constraint "visibility::text = ANY (ARRAY['global'::character varying, 'connections'::character varying, 'hidden'::character varying]::text[])", name: "check_visibility_enum"
   end
 
   add_foreign_key "letters", "users", column: "mentee_id"
@@ -198,6 +221,9 @@ ActiveRecord::Schema[7.1].define(version: 2025_05_15_042712) do
   add_foreign_key "mentorships", "users"
   add_foreign_key "proofs", "menteeships"
   add_foreign_key "proofs", "mentorships"
+  add_foreign_key "question_answers", "questions"
+  add_foreign_key "question_answers", "users"
+  add_foreign_key "questions", "users"
   add_foreign_key "skill_slot_ideas", "skills"
   add_foreign_key "slot_bookings", "slots"
   add_foreign_key "slot_bookings", "users"

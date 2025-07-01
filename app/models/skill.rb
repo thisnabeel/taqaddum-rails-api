@@ -4,4 +4,6 @@ class Skill < ApplicationRecord
 
   has_many :menteeships
   has_many :mentees, through: :menteeships, source: :user
+
+  has_many :questions, as: :questionable
 end

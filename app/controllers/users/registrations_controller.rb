@@ -3,7 +3,6 @@ class Users::RegistrationsController < Devise::RegistrationsController
 
   # Override create method
   def create
-
     Rails.logger.info "Received params: #{params.inspect}" # Debug params
     # Extract mentor and mentee skills before filtering parameters
     mentor_skills = params[:user].delete(:mentor_skills) || []
@@ -30,6 +29,7 @@ class Users::RegistrationsController < Devise::RegistrationsController
     mentor_skills = params[:user].delete(:mentor_skills)
     mentee_skills = params[:user].delete(:mentee_skills)
     skills = params[:user].delete(:skills) || [] # Extract skills separately
+    
     # Add linkedin_url and other attributes to permitted parameters
     user_params = params.require(:user).permit(:first_name, :last_name, :email, :profession, :company, :type, :linkedin_url)
 
@@ -38,6 +38,11 @@ class Users::RegistrationsController < Devise::RegistrationsController
     loop do
       preapproval_token = SecureRandom.uuid[0..5] # Generate a 6-character UUID
       break unless User.exists?(preapproval_token: preapproval_token)
+    end
+
+    # Generate a random identifier if email is not provided
+    if user_params[:email].blank?
+      user_params[:email] = "user_#{SecureRandom.hex(8)}@placeholder.com"
     end
 
     user = User.new(user_params.merge(password: "invited101!", preapproval_token: preapproval_token))
@@ -56,12 +61,16 @@ class Users::RegistrationsController < Devise::RegistrationsController
   end
 
   def update
-
     puts "HELLOO"
     user = User.find(params[:user][:id]) # Ensure you're updating the current user
 
     mentor_skills = params[:user].delete(:mentor_skills) || []
     mentee_skills = params[:user].delete(:mentee_skills) || []
+
+    # Handle email update if provided
+    if params[:user][:email].present?
+      user.email = params[:user][:email]
+    end
 
     if user.update(account_update_params)
       create_mentorships_and_menteeships(user, mentor_skills, mentee_skills)

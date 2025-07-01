@@ -1,0 +1,11 @@
+one:
+  body: "What is the best way to learn Rails?"
+  user: one
+  questionable: one
+  questionable_type: Skill
+
+two:
+  body: "How do I set up a mentorship?"
+  user: two
+  questionable: two
+  questionable_type: Mentorship

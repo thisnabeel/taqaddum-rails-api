@@ -17,6 +17,10 @@ module Users
         user.password = params[:password]
       end
 
+      if params[:email].present?
+        user.email = params[:email]
+      end
+
       # Clear the preapproval token and set converted_at timestamp
       user.preapproval_token = nil
       user.converted_at = Time.current

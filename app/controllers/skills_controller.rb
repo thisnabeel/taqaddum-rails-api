@@ -1,5 +1,5 @@
 class SkillsController < ApplicationController
-  before_action :set_skill, only: %i[ show update destroy ]
+  before_action :set_skill, only: %i[ show update destroy mentees mentors ]
 
   # GET /skills
   def index
@@ -8,6 +8,26 @@ class SkillsController < ApplicationController
       @skills = @skills.where('title ILIKE ?', "%#{params[:search]}%")
     end
     render json: @skills.shuffle
+  end
+
+  # GET /skills/:id/mentees
+  def mentees
+    @mentees = @skill.mentees.includes(:menteeships)
+    render json: @mentees.map { |mentee| 
+      mentee.as_json.merge(
+        menteeship: mentee.menteeships.find_by(skill: @skill)
+      )
+    }
+  end
+
+  # GET /skills/:id/mentors
+  def mentors
+    @mentors = @skill.mentors.includes(:mentorships)
+    render json: @mentors.map { |mentor| 
+      mentor.as_json.merge(
+        mentorship: mentor.mentorships.find_by(skill: @skill)
+      )
+    }
   end
 
   def offerings_ai
@@ -67,7 +87,13 @@ class SkillsController < ApplicationController
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_skill
-      @skill = Skill.find(params[:id])
+      @skill = if params[:id].match?(/\A\d+\z/)
+        Skill.find_by(id: params[:id])
+      else
+        Skill.find_by(title: params[:id].titleize)
+      end
+
+      render json: { error: "Skill not found" }, status: :not_found unless @skill
     end
 
     # Only allow a list of trusted parameters through.
