@@ -10,9 +10,25 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2025_07_01_015236) do
+ActiveRecord::Schema[7.1].define(version: 2025_07_02_025507) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
+
+  create_table "club_members", force: :cascade do |t|
+    t.bigint "club_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.string "memberable_type", null: false
+    t.bigint "memberable_id", null: false
+    t.index ["club_id"], name: "index_club_members_on_club_id"
+    t.index ["memberable_type", "memberable_id"], name: "index_club_members_on_memberable"
+  end
+
+  create_table "clubs", force: :cascade do |t|
+    t.string "title"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
 
   create_table "islamic_values", force: :cascade do |t|
     t.string "title"
@@ -212,6 +228,7 @@ ActiveRecord::Schema[7.1].define(version: 2025_07_01_015236) do
     t.check_constraint "visibility::text = ANY (ARRAY['global'::character varying, 'connections'::character varying, 'hidden'::character varying]::text[])", name: "check_visibility_enum"
   end
 
+  add_foreign_key "club_members", "clubs"
   add_foreign_key "letters", "users", column: "mentee_id"
   add_foreign_key "letters", "users", column: "mentor_id"
   add_foreign_key "meeting_offerings", "mentorships"

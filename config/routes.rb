@@ -1,6 +1,13 @@
 Rails.application.routes.draw do
   resources :question_answers
   get "/question_answers/for_question/:question_id" => "question_answers#for_question"
+  
+  resources :clubs do
+    member do
+      get :members
+    end
+  end
+  resources :club_members
   resources :sponsorship_interests
   resources :skill_slot_ideas
   resources :letters

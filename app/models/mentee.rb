@@ -84,6 +84,72 @@ class Mentee < User
         }
     end
 
+    def generate_fake_question
+        return nil if self.menteeships.empty?
+
+        menteeship = self.menteeships.sample
+
+        prompt = <<~PROMPT
+            Generate a fake question for #{menteeship.skill.title} for a mentee who is interested in #{menteeship.skill.title}.
+            The question should be a question that a mentee would ask a mentor.
+            The question should be a question that is relevant to the menteeship.
+            The question should be a question that is not already asked from list of questions: #{menteeship.skill.questions.map {|q| q.body}.join(", ")}
+
+            Choose ONE of these question prefixes and complete it with content relevant to #{menteeship.skill.title}:
+
+            🔍 Self-awareness & Challenge-Oriented:
+            - "I'm struggling with..." (e.g., balancing work and personal development)
+            - "I'm trying to decide between..." (e.g., staying at current company vs. exploring new opportunities)
+            - "I feel stuck on..." (e.g., advancing to the next level in my career)
+            - "I'm unsure how to approach..." (e.g., a major project or decision)
+
+            📈 Growth & Development:
+            - "What helped you when..." (e.g., you were transitioning to a new role or industry)
+            - "How did you handle..." (e.g., imposter syndrome in your early career)
+            - "What would you do differently if..." (e.g., you could go back to your early career days)
+
+            🛠️ Execution & Application:
+            - "Can I get your feedback on..." (e.g., my approach to solving this problem)
+            - "Do you think it's worth..." (e.g., investing time in learning this new skill)
+            - "What should I watch out for when..." (e.g., negotiating my next role)
+
+            The question should be specific to #{menteeship.skill.title} and not too long or too short.
+            The question should be a question that is not too general or too specific.
+            The question should be a question that is not too easy or too hard.
+
+            Return as JSON with exactly these fields:
+            {
+                "body": "string"
+            }
+        PROMPT
+
+        response = WizardService.ask(prompt)
+        return nil if response.empty?
+
+        # Handle both Hash and String responses
+        if response.is_a?(Hash)
+          question_body = response["body"]
+        else
+          begin
+            parsed_response = JSON.parse(response)
+            question_body = parsed_response["body"]
+          rescue JSON::ParserError
+            # If JSON parsing fails, use the raw response as fallback
+            question_body = response
+          end
+        end
+
+        question = Question.create!(
+            body: question_body,
+            user: self,
+            questionable: menteeship.skill
+        )
+
+        return {
+            question: question
+        }
+    end
+
     def send_mentor_pool_email
         require "resend"
         Resend.api_key = ENV["RESEND_API_KEY"]
